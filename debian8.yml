@@ -26,7 +26,7 @@ provisioners:
           - set -x
           - sleep 30
           - sudo apt-get update
-          - sudo apt-get install -y git autoconf automake gcc g++ zlib1g-dev libssl-dev libdb-dev libreadline-dev libeditline-dev make xsltproc libwww-perl
+          - sudo apt-get install -y git autoconf automake gcc g++ zlib1g-dev libssl-dev libdb-dev libreadline-dev libeditline-dev make xsltproc libwww-perl libboost-dev
           - sudo apt-get -y install python-pip python-virtualenv python-dev
           - sudo adduser --gecos Buildbot --disabled-password buildbot
           - sudo -i -u buildbot virtualenv buildbot
