@@ -1,0 +1,11 @@
+[Unit]
+Description=Buildbot slave
+After=network.target
+
+[Service]
+ExecStart=/home/buildbot/buildbot/bin/buildslave start --nodaemon /home/buildbot/slave 
+User=buildbot
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
