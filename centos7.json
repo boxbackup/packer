@@ -1,0 +1,47 @@
+{
+    "variables": {
+        "subnet_id": "",
+        "vpc_id": "",
+        "bb_passwd": "",
+        "bb_user": ""
+    },
+    "provisioners": [
+        {
+            "source": "buildslave.service",
+            "destination": "/tmp/buildslave.service",
+            "type": "file"
+        },
+        {
+            "inline": [
+                "set -x",
+                "sleep 30",
+                "sudo yum install -y git autoconf automake gcc gcc-c++ zlib-devel openssl-devel libdb-devel readline-devel make libxslt perl-libwww-perl boost-devel",
+                "sudo yum install -y epel-release",
+                "sudo yum install -y python-pip python-virtualenv python-devel",
+                "sudo adduser --comment Buildbot buildbot",
+                "sudo -i -u buildbot virtualenv buildbot",
+                "sudo -i -u buildbot bash -c 'source buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'",
+                "echo \"James O'Gorman <james+buildbot@netinertia.co.uk>\" | sudo tee /home/buildbot/slave/info/admin",
+                "echo \"CentOS 7 running on Amazon EC2\" | sudo tee /home/buildbot/slave/info/host",
+                "sudo mv /tmp/buildslave.service /etc/systemd/system",
+                "sudo chown root:root /etc/systemd/system/buildslave.service",
+                "sudo systemctl daemon-reload",
+                "sudo systemctl enable buildslave.service"
+            ],
+            "type": "shell"
+        }
+    ],
+    "builders": [
+        {
+            "source_ami": "ami-7abd0209",
+            "subnet_id": "{{user `subnet_id`}}",
+            "ssh_username": "centos",
+            "region": "eu-west-1",
+            "ami_name": "CentOS 7 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "instance_type": "t2.micro",
+            "vpc_id": "{{user `vpc_id`}}",
+            "type": "amazon-ebs",
+            "ssh_pty": true
+        }
+    ]
+}

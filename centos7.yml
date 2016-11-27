@@ -1,0 +1,40 @@
+variables:
+    bb_user: ""
+    bb_passwd: ""
+    subnet_id: ""
+    vpc_id: ""
+## Use AWS configuration from ~/.aws/credentials instead
+#    aws_access_key: abc123
+#    aws_secret_key: 123b
+builders:
+    - type: amazon-ebs
+      #access_key: '{{user `aws_access_key`}}'
+      #secret_key: '{{user `aws_secret_key`}}'
+      region: eu-west-1
+      source_ami: ami-7abd0209
+      instance_type: t2.micro
+      ssh_username: centos
+      ami_name: CentOS 7 Buildbot {{isotime "2006-01-02"}}-{{timestamp}}
+      subnet_id: '{{user `subnet_id`}}'
+      vpc_id: '{{user `vpc_id`}}'
+      ssh_pty: true  # RHEL/CentOS have requiretty in sudoers by default
+provisioners:
+    - type: file
+      source: buildslave.service
+      destination: /tmp/buildslave.service
+    - type: shell
+      inline:
+          - set -x
+          - sleep 30
+          - sudo yum install -y git autoconf automake gcc gcc-c++ zlib-devel openssl-devel libdb-devel readline-devel make libxslt perl-libwww-perl boost-devel
+          - sudo yum install -y epel-release
+          - sudo yum install -y python-pip python-virtualenv python-devel
+          - sudo adduser --comment Buildbot buildbot
+          - sudo -i -u buildbot virtualenv buildbot
+          - sudo -i -u buildbot bash -c 'source buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'
+          - echo "James O'Gorman <james+buildbot@netinertia.co.uk>" | sudo tee /home/buildbot/slave/info/admin
+          - echo "CentOS 7 running on Amazon EC2" | sudo tee /home/buildbot/slave/info/host
+          - sudo mv /tmp/buildslave.service /etc/systemd/system
+          - sudo chown root:root /etc/systemd/system/buildslave.service
+          - sudo systemctl daemon-reload
+          - sudo systemctl enable buildslave.service
