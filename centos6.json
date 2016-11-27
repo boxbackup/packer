@@ -1,0 +1,40 @@
+{
+    "variables": {
+        "subnet_id": "",
+        "vpc_id": "",
+        "bb_passwd": "",
+        "bb_user": ""
+    },
+    "provisioners": [
+        {
+            "inline": [
+                "set -x",
+                "sleep 30",
+                "sudo yum install -y git autoconf automake gcc gcc-c++ zlib-devel openssl-devel libdb-devel readline-devel make libxslt perl-libwww-perl boost-devel",
+                "sudo yum install -y centos-release-scl epel-release",
+                "sudo yum install -y python27 python27-python-pip python27-python-virtualenv python27-python-devel",
+                "sudo adduser --comment Buildbot buildbot",
+                "sudo -i -u buildbot scl enable python27 'virtualenv buildbot'",
+                "sudo -i -u buildbot scl enable python27 \"bash -c 'source buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'\"",
+                "echo \"James O'Gorman <james+buildbot@netinertia.co.uk>\" | sudo tee /home/buildbot/slave/info/admin",
+                "echo \"CentOS 6 running on Amazon EC2\" | sudo tee /home/buildbot/slave/info/host",
+                "echo 'echo \"Starting buildslave\"' | sudo tee -a /etc/rc.local",
+                "echo \"su - buildbot -c 'scl enable python27 \\\"/home/buildbot/buildbot/bin/buildslave start /home/buildbot/slave\\\"'\" | sudo tee -a /etc/rc.local"
+            ],
+            "type": "shell"
+        }
+    ],
+    "builders": [
+        {
+            "source_ami": "ami-edb9069e",
+            "subnet_id": "{{user `subnet_id`}}",
+            "ssh_username": "centos",
+            "region": "eu-west-1",
+            "ami_name": "CentOS 6 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "instance_type": "t2.micro",
+            "vpc_id": "{{user `vpc_id`}}",
+            "type": "amazon-ebs",
+            "ssh_pty": true
+        }
+    ]
+}

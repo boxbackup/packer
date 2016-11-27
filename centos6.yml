@@ -1,0 +1,39 @@
+variables:
+    bb_user: ""
+    bb_passwd: ""
+    subnet_id: ""
+    vpc_id: ""
+## Use AWS configuration from ~/.aws/credentials instead
+#    aws_access_key: abc123
+#    aws_secret_key: 123b
+builders:
+    - type: amazon-ebs
+      #access_key: '{{user `aws_access_key`}}'
+      #secret_key: '{{user `aws_secret_key`}}'
+      region: eu-west-1
+      source_ami: ami-edb9069e
+      instance_type: t2.micro
+      ssh_username: centos
+      ami_name: CentOS 6 Buildbot {{isotime "2006-01-02"}}-{{timestamp}}
+      subnet_id: '{{user `subnet_id`}}'
+      vpc_id: '{{user `vpc_id`}}'
+      ssh_pty: true  # RHEL/CentOS have requiretty in sudoers by default
+provisioners:
+    - type: shell
+      inline:
+          - set -x
+          - sleep 30
+          - sudo yum install -y git autoconf automake gcc gcc-c++ zlib-devel openssl-devel libdb-devel readline-devel make libxslt perl-libwww-perl boost-devel
+          # CentOS 6 only has Python 2.6. 2.7 is available as a "software collection"
+          # https://wiki.centos.org/AdditionalResources/Repositories/SCL
+          # Python PIP is only available in EPEL
+          # http://fedoraproject.org/wiki/EPEL
+          - sudo yum install -y centos-release-scl epel-release
+          - sudo yum install -y python27 python27-python-pip python27-python-virtualenv python27-python-devel
+          - sudo adduser --comment Buildbot buildbot
+          - sudo -i -u buildbot scl enable python27 'virtualenv buildbot'
+          - sudo -i -u buildbot scl enable python27 "bash -c 'source buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'"
+          - echo "James O'Gorman <james+buildbot@netinertia.co.uk>" | sudo tee /home/buildbot/slave/info/admin
+          - echo "CentOS 6 running on Amazon EC2" | sudo tee /home/buildbot/slave/info/host
+          - echo 'echo "Starting buildslave"' | sudo tee -a /etc/rc.local
+          - echo "su - buildbot -c 'scl enable python27 \"/home/buildbot/buildbot/bin/buildslave start /home/buildbot/slave\"'" | sudo tee -a /etc/rc.local
