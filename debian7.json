@@ -1,0 +1,40 @@
+{
+    "variables": {
+        "subnet_id": "",
+        "vpc_id": "",
+        "bb_passwd": "",
+        "bb_user": ""
+    },
+    "provisioners": [
+        {
+            "inline": [
+                "set -x",
+                "sleep 30",
+                "sudo apt-get update",
+                "sudo apt-get install -y git autoconf automake gcc g++ zlib1g-dev libssl-dev libdb-dev libreadline-dev libeditline-dev make xsltproc libwww-perl libboost-dev",
+                "sudo apt-get -y install python-pip python-virtualenv python-dev",
+                "sudo adduser --gecos Buildbot --disabled-password buildbot",
+                "sudo -i -u buildbot virtualenv buildbot",
+                "sudo -i -u buildbot bash -c 'source buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'",
+                "echo \"James O'Gorman <james+buildbot@netinertia.co.uk>\" | sudo tee /home/buildbot/slave/info/admin",
+                "echo \"Debian 7 (Wheezy) running on Amazon EC2\" | sudo tee /home/buildbot/slave/info/host",
+                "sudo sed -i -e '/exit 0/d' /etc/rc.local",
+                "echo 'echo \"Starting buildslave\"' | sudo tee -a /etc/rc.local",
+                "echo \"su - buildbot -c '/home/buildbot/buildbot/bin/buildslave start /home/buildbot/slave'\" | sudo tee -a /etc/rc.local"
+            ],
+            "type": "shell"
+        }
+    ],
+    "builders": [
+        {
+            "source_ami": "ami-61e56916",
+            "subnet_id": "{{user `subnet_id`}}",
+            "ssh_username": "admin",
+            "region": "eu-west-1",
+            "ami_name": "Debian 7 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "instance_type": "t2.micro",
+            "vpc_id": "{{user `vpc_id`}}",
+            "type": "amazon-ebs"
+        }
+    ]
+}
