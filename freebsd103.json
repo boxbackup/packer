@@ -1,0 +1,43 @@
+{
+    "variables": {
+        "subnet_id": "",
+        "vpc_id": "",
+        "bb_passwd": "",
+        "bb_user": ""
+    },
+    "provisioners": [
+        {
+            "inline": [
+                "set -x",
+                "sleep 30",
+                "su - root -c 'env ASSUME_ALWAYS_YES=YES pkg bootstrap'",
+                "su - root -c 'pkg install -y git autoconf automake libxslt p5-libwww boost-libs'",
+                "su - root -c 'pkg install -y python py27-pip py27-virtualenv'",
+                "su - root -c 'pw useradd buildbot -c Buildbot -m -w none'",
+                "su - buildbot -c 'virtualenv buildbot'",
+                "su - buildbot -c '. buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'",
+                "su - buildbot -c \"echo James O\\'Gorman '<james+buildbot@netinertia.co.uk>' > /home/buildbot/slave/info/admin\"",
+                "su - buildbot -c 'echo \"FreeBSD 10.3 running on Amazon EC2\" > /home/buildbot/slave/info/host'",
+                "su - root -c 'pw usermod buildbot -w no'",
+                "su - root -c 'echo echo \"Starting buildslave\" >> /etc/rc.local'",
+                "su - root -c \"echo su - buildbot -c \\'/home/buildbot/buildbot/bin/buildslave start /home/buildbot/slave\\' >> /etc/rc.local\"",
+                "su - root -c 'chmod 755 /etc/rc.local'",
+                "su - root -c 'touch /firstboot'"
+            ],
+            "type": "shell"
+        }
+    ],
+    "builders": [
+        {
+            "source_ami": "ami-a2f87fd1",
+            "subnet_id": "{{user `subnet_id`}}",
+            "ssh_username": "ec2-user",
+            "region": "eu-west-1",
+            "ami_name": "FreeBSD 10.3 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "instance_type": "t2.micro",
+            "ssh_timeout": "10m",
+            "vpc_id": "{{user `vpc_id`}}",
+            "type": "amazon-ebs"
+        }
+    ]
+}
