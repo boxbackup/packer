@@ -14,6 +14,7 @@
                 "su - root -c 'pkg install -y git autoconf automake libxslt p5-libwww boost-libs'",
                 "su - root -c 'pkg install -y python py27-pip py27-virtualenv'",
                 "su - root -c 'pw useradd buildbot -c Buildbot -m -w none'",
+                "su - root -c 'rm /home/buildbot/.login /home/buildbot/.profile'",
                 "su - buildbot -c 'virtualenv buildbot'",
                 "su - buildbot -c '. buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'",
                 "su - buildbot -c \"echo James O\\'Gorman '<james+buildbot@netinertia.co.uk>' > /home/buildbot/slave/info/admin\"",
@@ -21,8 +22,7 @@
                 "su - root -c 'pw usermod buildbot -w no'",
                 "su - root -c 'echo echo \"Starting buildslave\" >> /etc/rc.local'",
                 "su - root -c \"echo su - buildbot -c \\'/home/buildbot/buildbot/bin/buildslave start /home/buildbot/slave\\' >> /etc/rc.local\"",
-                "su - root -c 'chmod 755 /etc/rc.local'",
-                "su - root -c 'touch /firstboot'"
+                "su - root -c 'chmod 755 /etc/rc.local'"
             ],
             "type": "shell"
         }
