@@ -33,7 +33,7 @@
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "ec2-user",
             "region": "eu-west-1",
-            "ami_name": "FreeBSD 10.3 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "ami_name": "FreeBSD 10.3 Buildbot 0.8 {{isotime \"2006-01-02\"}}",
             "instance_type": "t2.micro",
             "ssh_timeout": "10m",
             "vpc_id": "{{user `vpc_id`}}",

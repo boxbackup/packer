@@ -14,7 +14,7 @@ builders:
       source_ami: ami-0d063c6b
       instance_type: t2.micro
       ssh_username: centos
-      ami_name: CentOS 7 Buildbot {{isotime "2006-01-02"}}-{{timestamp}}
+      ami_name: CentOS 7 Buildbot 0.8 {{isotime "2006-01-02"}}
       launch_block_device_mappings:
           - device_name: /dev/sda1
             volume_type: gp2

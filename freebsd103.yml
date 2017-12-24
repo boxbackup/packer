@@ -14,7 +14,7 @@ builders:
       source_ami: ami-a2f87fd1
       instance_type: t2.micro
       ssh_username: ec2-user
-      ami_name: FreeBSD 10.3 Buildbot {{isotime "2006-01-02"}}-{{timestamp}}
+      ami_name: FreeBSD 10.3 Buildbot 0.8 {{isotime "2006-01-02"}}
       launch_block_device_mappings:
           - device_name: /dev/sda1
             volume_type: gp2

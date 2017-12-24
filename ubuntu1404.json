@@ -31,7 +31,7 @@
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "ubuntu",
             "region": "eu-west-1",
-            "ami_name": "Ubuntu 14.04 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "ami_name": "Ubuntu 14.04 Buildbot 0.8 {{isotime \"2006-01-02\"}}",
             "instance_type": "t2.micro",
             "vpc_id": "{{user `vpc_id`}}",
             "launch_block_device_mappings": [

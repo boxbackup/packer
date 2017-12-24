@@ -37,7 +37,7 @@
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "admin",
             "region": "eu-west-1",
-            "ami_name": "Debian 8 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "ami_name": "Debian 8 Buildbot 0.8 {{isotime \"2006-01-02\"}}",
             "instance_type": "t2.micro",
             "vpc_id": "{{user `vpc_id`}}",
             "launch_block_device_mappings": [
