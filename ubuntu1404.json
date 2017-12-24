@@ -27,7 +27,7 @@
     ],
     "builders": [
         {
-            "source_ami": "ami-bea5f3cd",
+            "source_ami": "ami-64b3361d",
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "ubuntu",
             "region": "eu-west-1",

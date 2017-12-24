@@ -33,7 +33,7 @@
     ],
     "builders": [
         {
-            "source_ami": "ami-7abd0209",
+            "source_ami": "ami-0d063c6b",
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "centos",
             "region": "eu-west-1",

@@ -11,7 +11,7 @@ builders:
       #access_key: '{{user `aws_access_key`}}'
       #secret_key: '{{user `aws_secret_key`}}'
       region: eu-west-1
-      source_ami: ami-7abd0209
+      source_ami: ami-0d063c6b
       instance_type: t2.micro
       ssh_username: centos
       ami_name: CentOS 7 Buildbot {{isotime "2006-01-02"}}-{{timestamp}}

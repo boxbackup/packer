@@ -33,7 +33,7 @@
     ],
     "builders": [
         {
-            "source_ami": "ami-07174474",
+            "source_ami": "ami-63b0341a",
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "ubuntu",
             "region": "eu-west-1",

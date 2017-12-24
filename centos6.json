@@ -26,7 +26,7 @@
     ],
     "builders": [
         {
-            "source_ami": "ami-edb9069e",
+            "source_ami": "ami-8f043ee9",
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "centos",
             "region": "eu-west-1",
