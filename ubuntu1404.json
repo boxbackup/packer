@@ -34,6 +34,13 @@
             "ami_name": "Ubuntu 14.04 Buildbot {{isotime \"2006-01-02\"}}-{{timestamp}}",
             "instance_type": "t2.micro",
             "vpc_id": "{{user `vpc_id`}}",
+            "launch_block_device_mappings": [
+                {
+                    "delete_on_termination": true,
+                    "volume_type": "gp2",
+                    "device_name": "/dev/sda1"
+                }
+            ],
             "type": "amazon-ebs"
         }
     ]

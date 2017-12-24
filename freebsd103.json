@@ -37,6 +37,13 @@
             "instance_type": "t2.micro",
             "ssh_timeout": "10m",
             "vpc_id": "{{user `vpc_id`}}",
+            "launch_block_device_mappings": [
+                {
+                    "delete_on_termination": true,
+                    "volume_type": "gp2",
+                    "device_name": "/dev/sda1"
+                }
+            ],
             "type": "amazon-ebs"
         }
     ]

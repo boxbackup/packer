@@ -15,6 +15,10 @@ builders:
       instance_type: t2.micro
       ssh_username: centos
       ami_name: CentOS 7 Buildbot {{isotime "2006-01-02"}}-{{timestamp}}
+      launch_block_device_mappings:
+          - device_name: /dev/sda1
+            volume_type: gp2
+            delete_on_termination: true
       subnet_id: '{{user `subnet_id`}}'
       vpc_id: '{{user `vpc_id`}}'
       ssh_pty: true  # RHEL/CentOS have requiretty in sudoers by default
