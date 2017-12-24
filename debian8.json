@@ -44,7 +44,7 @@
                 {
                     "delete_on_termination": true,
                     "volume_type": "gp2",
-                    "device_name": "/dev/sda1"
+                    "device_name": "/dev/xvda"
                 }
             ],
             "type": "amazon-ebs"

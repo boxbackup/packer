@@ -16,7 +16,7 @@ builders:
       ssh_username: admin
       ami_name: Debian 8 Buildbot 0.8 {{isotime "2006-01-02"}}
       launch_block_device_mappings:
-          - device_name: /dev/sda1
+          - device_name: /dev/xvda
             volume_type: gp2
             delete_on_termination: true
       subnet_id: '{{user `subnet_id`}}'
