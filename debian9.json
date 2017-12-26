@@ -2,8 +2,7 @@
     "variables": {
         "subnet_id": "",
         "vpc_id": "",
-        "bb_passwd": "",
-        "bb_user": ""
+        "bb_passwd": ""
     },
     "provisioners": [
         {
@@ -16,12 +15,38 @@
                 "set -x",
                 "sleep 30",
                 "sudo apt-get update",
-                "sudo apt-get -y upgrade",
-                "sudo apt-get install -y git autoconf automake gcc g++ zlib1g-dev libssl-dev libdb-dev libreadline-dev libeditline-dev make xsltproc libwww-perl libboost-dev",
+                "sudo apt-get -y upgrade"
+            ],
+            "type": "shell"
+        },
+        {
+            "inline": [
+                "set -x",
+                "sudo apt-get install -y git autoconf automake gcc g++ zlib1g-dev libssl1.0-dev libdb-dev libreadline-dev libeditline-dev make xsltproc libwww-perl libboost-dev"
+            ],
+            "only": [
+                "debian9ssl10"
+            ],
+            "type": "shell"
+        },
+        {
+            "inline": [
+                "set -x",
+                "sudo apt-get install -y git autoconf automake gcc g++ zlib1g-dev libssl-dev libdb-dev libreadline-dev libeditline-dev make xsltproc libwww-perl libboost-dev"
+            ],
+            "only": [
+                "debian9ssl11"
+            ],
+            "type": "shell"
+        },
+        {
+            "inline": [
+                "set -x",
+                "export PACKER_BUILD_NAME",
                 "sudo apt-get -y install python-pip python-virtualenv python-dev",
                 "sudo adduser --gecos Buildbot --disabled-password buildbot",
                 "sudo -i -u buildbot virtualenv buildbot",
-                "sudo -i -u buildbot bash -c 'source buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org {{user `bb_user`}} {{user `bb_passwd`}}'",
+                "sudo -E -i -u buildbot PACKER_BUILD_NAME=\"$PACKER_BUILD_NAME\" bash -c 'echo PACKER_BUILD_NAME=$PACKER_BUILD_NAME; source buildbot/bin/activate; pip install buildbot-slave; buildslave create-slave slave builds.boxbackup.org ${PACKER_BUILD_NAME} {{user `bb_passwd`}}'",
                 "echo \"James O'Gorman <james+buildbot@netinertia.co.uk>\" | sudo tee /home/buildbot/slave/info/admin",
                 "echo \"Debian 9 (Stretch) running on Amazon EC2\" | sudo tee /home/buildbot/slave/info/host",
                 "sudo mv /tmp/buildslave.service /etc/systemd/system",
@@ -35,10 +60,29 @@
     "builders": [
         {
             "source_ami": "ami-9fba3be6",
+            "name": "debian9ssl10",
             "subnet_id": "{{user `subnet_id`}}",
             "ssh_username": "admin",
             "region": "eu-west-1",
-            "ami_name": "Debian 9 Buildbot 0.8 {{isotime \"2006-01-02\"}}",
+            "ami_name": "Debian 9 Buildbot 0.8 LibSSL 1.0 {{isotime \"2006-01-02\"}}-{{timestamp}}",
+            "instance_type": "t2.micro",
+            "vpc_id": "{{user `vpc_id`}}",
+            "launch_block_device_mappings": [
+                {
+                    "delete_on_termination": true,
+                    "volume_type": "gp2",
+                    "device_name": "xvda"
+                }
+            ],
+            "type": "amazon-ebs"
+        },
+        {
+            "source_ami": "ami-9fba3be6",
+            "name": "debian9ssl11",
+            "subnet_id": "{{user `subnet_id`}}",
+            "ssh_username": "admin",
+            "region": "eu-west-1",
+            "ami_name": "Debian 9 Buildbot 0.8 LibSSL 1.1 {{isotime \"2006-01-02\"}}-{{timestamp}}",
             "instance_type": "t2.micro",
             "vpc_id": "{{user `vpc_id`}}",
             "launch_block_device_mappings": [
