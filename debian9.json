@@ -29,6 +29,8 @@
             "inline": [
                 "set -x",
                 ". /tmp/utils.sh",
+                "echo deb http://ftp.debian.org/debian stretch-backports main | sudo tee /etc/apt/sources.list.d/backports.list",
+                "sudo apt-get update && sudo apt-get -t stretch-backports -y install systemd",
                 "sudo apt-get install -y debootstrap",
                 "sudo debootstrap --arch=i386 ${RELEASE} ${CHROOT} http://deb.debian.org/debian",
                 "echo \"proc $CHROOT/proc proc defaults 0 0\" >> /tmp/fstab.$$",
@@ -94,7 +96,7 @@
             "inline": [
                 "set -x",
                 ". /tmp/utils.sh",
-                "sed -i -e \"/\\[Service\\]/a RootDirectory=$CHROOT\" /tmp/buildslave.service"
+                "sed -i -e '/\\[Service\\]/a\\' -e RootDirectory=$CHROOT'\\' -e 'BindPaths=/etc/resolv.conf' /tmp/buildslave.service"
             ],
             "only": [
                 "debian9ssl10-i386",

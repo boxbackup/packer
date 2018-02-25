@@ -83,6 +83,9 @@ provisioners:
       inline:
           - set -x
           - . /tmp/utils.sh
+          # Install systemd from backports so we can get BindPaths
+          - echo deb http://ftp.debian.org/debian stretch-backports main | sudo tee /etc/apt/sources.list.d/backports.list
+          - sudo apt-get update && sudo apt-get -t stretch-backports -y install systemd
           - sudo apt-get install -y debootstrap
           - sudo debootstrap --arch=i386 ${RELEASE} ${CHROOT} http://deb.debian.org/debian
           - echo "proc $CHROOT/proc proc defaults 0 0" >> /tmp/fstab.$$
@@ -92,6 +95,8 @@ provisioners:
           - sudo mount -a
           - rm /tmp/fstab.$$
           - sudo cp /etc/hosts $CHROOT/etc/hosts
+          # This copy of resolv.conf is only used for the duration of the build
+          # The service sets up its own bind mount (see below)
           - sudo cp /etc/resolv.conf $CHROOT/etc/resolv.conf
           - sudo cp /proc/mounts $CHROOT/etc/mtab
           - sudo chroot $CHROOT apt-get install -y sudo
@@ -126,9 +131,12 @@ provisioners:
     - type: shell
       inline:
           # Tell systemd to chroot the service
+          # Bind mount resolv.conf to get the current resolver
+          # This is more reliable than copying (becomes outdated) or using
+          # fstab bind mounts as the inode may change
           - set -x
           - . /tmp/utils.sh
-          - sed -i -e "/\[Service\]/a RootDirectory=$CHROOT" /tmp/buildslave.service
+          - sed -i -e '/\[Service\]/a\' -e RootDirectory=$CHROOT'\' -e 'BindPaths=/etc/resolv.conf' /tmp/buildslave.service
       inline_shebang: /bin/bash -e
       only: ["debian9ssl10-i386", "debian9ssl11-i386"]
     - type: shell
